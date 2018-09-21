@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
+#include <array>
+
 using namespace std;
+typedef vector<int> VI;
 
 
 int nchooses4(int n){
@@ -14,15 +17,8 @@ int nchooses2(int n){
 void testcase(){
   int n; cin >> n;
 
-
-  int bits [n+1][n+1];
-  int sums [n+1][n+1];
-  for(int i=0;i<=n;i++){
-    for(int j=0;j<=n;j++){
-      bits[i][j] = 0;
-      sums[i][j] = 0;
-    }
-  }
+  vector<VI> bits(n+1,VI(n+1,0));
+  vector<VI> sums(n+1,VI(n+1,0));
 
   for(int i=1;i<=n;i++){
     for(int j=1;j<=n;j++){
@@ -32,25 +28,39 @@ void testcase(){
     }
   }
 
-  /*/
-  for(int i=0;i<=n;i++){
-    for(int j=0;j<=n;j++){
-      cout << sums[i][j];
-    }
-    cout << endl;
-  }
-  */
-
   int even_pairs=0;
+  vector<vector<VI>> dp_e(n+1,vector<VI>(n+1,VI(n+1,0)));
+  vector<vector<VI>> dp_o(n+1,vector<VI>(n+1,VI(n+1,0)));
 
-  for(int i1=1;i1<=n;i1++){
-    for(int j1=1;j1<=n;j1++){
-      for(int i2=i1;i2<=n;i2++){
-        for(int j2=j1;j2<=n;j2++){
-          int s = sums[i2][j2] - sums[i2][j1-1] - sums[i1-1][j2] +
-                  sums[i1-1][j1-1];
-          if(s%2==0) even_pairs++;
+  // init
+  for(int r=1;r<=n;r++){
+    for(int l=1;l<=r;l++){
+      int s = sums[1][r]-sums[1][l-1];
+      if(s%2==0) dp_e[1][l][r] = 1;
+      else dp_o[1][l][r] = 1;
+    }
+  }
+
+  for(int i=2;i<=n;i++){
+    for(int r=1;r<=n;r++){
+      for(int l=1;l<=r;l++){
+        int s = sums[i][r]-sums[i][l-1]-sums[i-1][r]+sums[i-1][l-1];
+        if(s%2==0) {
+          dp_e[i][l][r] = dp_e[i-1][l][r]+1;
+          dp_o[i][l][r] = dp_o[i-1][l][r];
         }
+        else {
+          dp_o[i][l][r] = dp_e[i-1][l][r]+1;
+          dp_e[i][l][r] = dp_o[i-1][l][r];
+        }
+      } 
+    }
+  }
+
+  for(int i=1;i<=n;i++){
+    for(int r=1;r<=n;r++){
+      for(int l=1;l<=r;l++){
+        even_pairs += dp_e[i][l][r];
       }
     }
   }
