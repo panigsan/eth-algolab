@@ -5,15 +5,6 @@
 using namespace std;
 typedef vector<int> VI;
 
-
-int nchooses4(int n){
-  return n*(n-1)*(n-2)*(n-3)/24;
-}
-
-int nchooses2(int n){
-  return n*(n-1)*2;
-}
-
 void testcase(){
   int n; cin >> n;
 
@@ -36,8 +27,13 @@ void testcase(){
   for(int r=1;r<=n;r++){
     for(int l=1;l<=r;l++){
       int s = sums[1][r]-sums[1][l-1];
-      if(s%2==0) dp_e[1][l][r] = 1;
-      else dp_o[1][l][r] = 1;
+      if(s%2==0){
+        dp_e[1][l][r] = 1;
+        even_pairs++;
+      }
+      else {
+        dp_o[1][l][r] = 1;
+      }
     }
   }
 
@@ -53,15 +49,8 @@ void testcase(){
           dp_o[i][l][r] = dp_e[i-1][l][r]+1;
           dp_e[i][l][r] = dp_o[i-1][l][r];
         }
-      } 
-    }
-  }
-
-  for(int i=1;i<=n;i++){
-    for(int r=1;r<=n;r++){
-      for(int l=1;l<=r;l++){
         even_pairs += dp_e[i][l][r];
-      }
+      } 
     }
   }
 
