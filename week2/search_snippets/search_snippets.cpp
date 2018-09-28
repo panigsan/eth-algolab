@@ -3,76 +3,53 @@
 #include <set>
 #include <limits>
 #include <algorithm>
+#include <cassert>
 
 using namespace std;
 
 void testcase(){
   int n; cin >> n;
   vector<int> m(n,0);
-  int tot_w = 0;
   for(int i=0;i<n;i++){
     int mi; cin >> mi;
-    m[i] = mi;
-    tot_w += mi;
+    m[i]=mi;
   }
-
-
-  vector<vector<int>> p;
-  set<pair<int,int>> data;
+  vector<vector<int>> p(n,vector<int>());
   for(int i=0;i<n;i++){
-    p.push_back(vector<int>());
     for(int j=0;j<m[i];j++){
       int pj; cin >> pj;
-      data.insert({pj,i});
       p[i].push_back(pj);
     }
   }
+  // {index,type} from where I take the words
+  set<pair<int,int>> pos;
 
-  vector<int> pos;
-  vector<int> typs;
-  for(pair<int,int> d : data){
-    pos.push_back(d.first);
-    typs.push_back(d.second);
+  // at the beginning I take for each word their first occurence
+  for(int i=0;i<n;i++) pos.insert({p[i][0],i});
+
+  int size = numeric_limits<int>::max();
+  while(1){
+    pair<int,int> smallest = *pos.begin();
+    pair<int,int> largest = *pos.rbegin();
+    int s = largest.first - smallest.first+1;
+    if(s<size) size=s;
+
+    // remove the word at the smallest index and find the next one
+    int index = smallest.first;
+    int type = smallest.second;
+    auto it = upper_bound(p[type].begin(),p[type].end(),index);
+    if(it==p[type].end()) break;
+
+    int new_index = *it;
+    pos.erase(pos.begin());
+    pos.insert({new_index,type});
   }
 
-
-  vector<int> count(n,0);
-  set<int> missing;
-  int l=0;
-  int r=0;
-  int best_d = numeric_limits<int>::max();
-  for(int i=0;i<n;i++) missing.insert(i);
-  auto it = missing.find(typs[0]);
-  missing.erase(it);
-  count[typs[0]] = 1;
-
-  while(l<tot_w && r<tot_w){
-    if(missing.size()>0){
-      r++;
-      if(r>=tot_w) break;
-      int ty = typs[r];
-      count[ty]++;
-      auto it = missing.find(ty);
-      if(missing.find(ty) != missing.end()){
-        missing.erase(it);
-      }
-    }else{
-      int d = pos[r] - pos[l]+1;
-      if(d < best_d) {
-        best_d = d;
-      }
-      int ty = typs[l];
-      count[ty]--;
-      if(count[ty]==0){
-        missing.insert(ty);
-      }
-      l++;
-    }
-  }
-  cout << best_d << endl;
+  cout << size << endl;
 }
 
 int main(){
+  ios_base::sync_with_stdio(false);
   int t; cin >> t;
   for(int i=0;i<t;i++) testcase();
 }
