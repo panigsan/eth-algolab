@@ -1,3 +1,7 @@
+*
+!*/
+!*.*
+
 .DS_Store
 main
 # Prerequisites
@@ -31,3 +35,6 @@ main
 # Executables
 *.exe
 *.app
+
+*make*
+*.tcl
