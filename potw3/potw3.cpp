@@ -4,38 +4,41 @@
 #include <set>
 #include <utility>
 #include <algorithm>
+#include <map>
 
 using namespace std;
-
-int solve(int,int);
-int solve();
+// solution in O(n*m) ;)
 
 int n,m,k;
 
 vector<int> v;
+// dp[l][i] = max attack when at line l and still have i attackers
 vector<vector<int>> dp;
+// just a partial sum
 vector<int> sums;
+// stores (sum,index_of_the_sum) for very fast access ;) 
+map<int,int> m_sums;
+
 void testcase(){
   cin >> n >> m >> k;
   v.clear();
   dp.clear();
   sums.clear();
+  m_sums.clear();
+
+  // initialization
   v.push_back(-1);
+  sums.push_back(0);
+  dp.push_back(vector<int>(m+1,-1));
   for(int i=1;i<=n;i++){
     int vi; cin >> vi;
     v.push_back(vi);
-  }
 
-  
-  for(int i=0;i<=n+1;i++){
+    sums.push_back(sums[i-1] + v[i]);
+    m_sums.insert(make_pair(sums[i],i));
     dp.push_back(vector<int>(m+1,-1));
   }
-
-  sums.push_back(0);
-  for(int i=1;i<=n;i++){
-    sums.push_back(sums[i-1] + v[i]);
-  }
-
+  
   int l=n-1;
   dp[n+1][0] = 0;
   dp[n][0] = 0;
@@ -43,15 +46,13 @@ void testcase(){
 
   while(l>=1){
     dp[l][0] = 0;
-    auto it = find(sums.begin(),sums.end(),sums[l-1]+k);
-    if(it==sums.end()){
-      //cout << "l: " << l << " not found " << endl;
+    auto it=m_sums.find(sums[l-1]+k);
+    if(it==m_sums.end()){
       for(int i=1;i<=m;i++){
         dp[l][i] = dp[l+1][i];
       }
     } else {
-      int r = it-sums.begin();
-      //cout << "l: " << l << " found at " << r << endl;
+      int r = it->second;
       for(int i=1;i<=m;i++){
         if(dp[r+1][i-1] == -1) 
           dp[l][i] = dp[l+1][i];
@@ -59,22 +60,6 @@ void testcase(){
           dp[l][i] = max(dp[l+1][i],(r-l+1)+dp[r+1][i-1]);
       }
     }
-    /*
-    int r=l;
-    int s=v[r];
-    while(s<k && r<n){
-      r++;
-      s += v[r];
-    }
-    dp[l][0] = 0;
-    for(int i=1;i<=m;i++){
-      if(s==k && dp[r+1][i-1]!=-1){
-        dp[l][i] = max(dp[l+1][i],(r-l+1)+dp[r+1][i-1]);
-      } else {
-        dp[l][i] = dp[l+1][i];
-      }
-    }
-    */
     l--;
   }
 
