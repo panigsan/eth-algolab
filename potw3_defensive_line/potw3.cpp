@@ -1,7 +1,5 @@
 #include <iostream>
-#include <cassert>
 #include <vector>
-#include <set>
 #include <utility>
 #include <algorithm>
 #include <map>
@@ -44,8 +42,10 @@ void testcase(){
   dp[n][0] = 0;
   if(v[n]==k) dp[n][1] = 1;
 
+  // starting from the end fill the dp
   while(l>=1){
     dp[l][0] = 0;
+    // check if possible to start attacking a line at position l
     auto it=m_sums.find(sums[l-1]+k);
     if(it==m_sums.end()){
       for(int i=1;i<=m;i++){
