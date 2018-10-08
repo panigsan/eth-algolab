@@ -1,19 +1,25 @@
 #include <iostream>
 #include <cassert>
 #include <vector>
+#include <set>
+#include <utility>
+#include <algorithm>
 
 using namespace std;
 
 int solve(int,int);
+int solve();
 
 int n,m,k;
 
 vector<int> v;
-vector<int> dp;
+vector<vector<int>> dp;
+vector<int> sums;
 void testcase(){
   cin >> n >> m >> k;
   v.clear();
   dp.clear();
+  sums.clear();
   v.push_back(-1);
   for(int i=1;i<=n;i++){
     int vi; cin >> vi;
@@ -21,54 +27,64 @@ void testcase(){
   }
 
   
-  for(int i=0;i<=n;i++){
-    dp.push_back(-1);
-    //dp.push_back(vector<int>(m+1,-1));
+  for(int i=0;i<=n+1;i++){
+    dp.push_back(vector<int>(m+1,-1));
   }
-  /*
-  for(int i=0;i<=n;i++){
-    for(int j=0;j<m;j++){
-      assert(dp[i][j]==-1);
-    }
-  }*/
 
-  int res = solve(1,m);
-  if(res==-1) cout << "fail" << endl;
-  else        cout << res << endl;
-  //cout << "--" << endl;
-}
+  sums.push_back(0);
+  for(int i=1;i<=n;i++){
+    sums.push_back(sums[i-1] + v[i]);
+  }
 
-int solve(int l, int a){
-  if(a==0) return 0;
-  if(l==n+1) return -1;
-  if(dp[l] != -1) return min(a,dp[l]); //cout << "l: " << l << " a " << a << endl;
-  //if(l==n && v[n]==k) return 1;
+  int l=n-1;
+  dp[n+1][0] = 0;
+  dp[n][0] = 0;
+  if(v[n]==k) dp[n][1] = 1;
 
-  int best = -1;
-  int border=l;
-  int i=l;
-  while(border<=n){
-    i = border;
-    int s = v[i];
-    while(s<k && i<n){
-      i++;
-      s += v[i];
-    }
-    if(s==k){
-      //cout << "- l: " << l << " a: " << a << " i: " << i << endl;
-      int res = solve(i+1,a-1);
-      if(res!=-1){
-        best = max(best,(i-border+1) +res);
+  while(l>=1){
+    dp[l][0] = 0;
+    auto it = find(sums.begin(),sums.end(),sums[l-1]+k);
+    if(it==sums.end()){
+      //cout << "l: " << l << " not found " << endl;
+      for(int i=1;i<=m;i++){
+        dp[l][i] = dp[l+1][i];
+      }
+    } else {
+      int r = it-sums.begin();
+      //cout << "l: " << l << " found at " << r << endl;
+      for(int i=1;i<=m;i++){
+        if(dp[r+1][i-1] == -1) 
+          dp[l][i] = dp[l+1][i];
+        else
+          dp[l][i] = max(dp[l+1][i],(r-l+1)+dp[r+1][i-1]);
       }
     }
-    border++;
+    /*
+    int r=l;
+    int s=v[r];
+    while(s<k && r<n){
+      r++;
+      s += v[r];
+    }
+    dp[l][0] = 0;
+    for(int i=1;i<=m;i++){
+      if(s==k && dp[r+1][i-1]!=-1){
+        dp[l][i] = max(dp[l+1][i],(r-l+1)+dp[r+1][i-1]);
+      } else {
+        dp[l][i] = dp[l+1][i];
+      }
+    }
+    */
+    l--;
   }
-  dp[l] = best;
 
-  //cout << "l: " << l << " a: " << a << " best: " << best << endl;
-  return best;
+
+  int res = dp[1][m];
+  if(res==-1) cout << "fail" << endl;
+  else        cout << res << endl;
 }
 
+  
 int main(){
   int t; cin >> t;
   for(int i=0;i<t;i++) testcase();
