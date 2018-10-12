@@ -1,0 +1,90 @@
+#include <iostream>
+#include <vector>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/undirected_dfs.hpp>
+//#include <boost/graph/depth_first_search.hpp>
+using namespace boost;
+
+enum vertex_info_t {vertex_info = 300};
+BOOST_INSTALL_PROPERTY(vertex,info);
+struct VertexInfo{
+  int dtime, ftime, mintime;
+};
+
+typedef adjacency_list<vecS,vecS,undirectedS,
+                       no_property,
+                       //property<vertex_info_t, VertexInfo>,
+                       property<edge_color_t, default_color_type> > Graph;
+typedef Graph::edge_descriptor Edge;
+typedef Graph::vertex_descriptor Vertex;
+typedef Graph::edge_iterator EdgeIt;
+typedef Graph::out_edge_iterator OutEdgeIt;
+typedef Graph::vertex_iterator VertexIt;
+typedef property_map<Graph,edge_color_t>::type EdgeColorMap;
+//typedef property_map<Graph,vertex_info_t>::type InfoMap;
+
+typedef std::vector<int> VI;
+
+struct MyVisitor : public dfs_visitor<>{
+  MyVisitor(VI& _dtime, VI& _ftime, VI& _mint, EdgeColorMap& _ecm, int time):
+    dtime(_dtime), ftime(_ftime), mint(_mint), ecm(_ecm), t(time){};
+  void discover_vertex(Vertex u, const Graph& g) {
+    dtime[u] = t;
+    t++;
+  }
+
+  void finish_vertex(Vertex u, const Graph& g){
+    mint[u] = dtime[u];
+
+    VertexIt vbeg, vend;
+    //tie(vbeg,vend) = adjacent_vertices(u,g);
+    //for(tie(vbeg,vend) = adjacent_vertices(u,g);vbeg!=vend;++vbeg){
+      /*Vertex v = *vbeg;
+      if(dtime[v] != dtime[u]+1){
+        //mint[u] = std::min(mint[u],mint[v]);
+      }*/
+    //}
+  }
+
+  protected:
+    VI& dtime;
+    VI& ftime;
+    VI& mint;
+    EdgeColorMap& ecm;
+    int t;
+};
+
+void testcase(){
+  int n,m;
+  std::cin >> n >> m;
+
+  Graph G(n);
+
+  for(int i=0;i<m;i++){
+    int u,v;
+    std::cin >> u >> v;
+    add_edge(u,v,G);
+  }
+  
+  // maps to store information about the vertex
+  VI dtime(n);
+  VI ftime(n);
+  VI mint(n);
+  EdgeColorMap ecm = get(edge_color,G);
+  MyVisitor vis(dtime,ftime,mint,ecm,1);
+  undirected_dfs(G,root_vertex(Vertex(0)).
+                   visitor(vis).
+                   edge_color_map(ecm));
+
+  VertexIt vbeg, vend;
+  for(tie(vbeg,vend) = vertices(G);vbeg!=vend;++vbeg){
+    std::cout << dtime[*vbeg] << std::endl; 
+  }
+
+
+}
+
+int main(){
+  int T; std::cin >> T;
+  while(T--) testcase();
+}
