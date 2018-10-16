@@ -12,10 +12,12 @@ int n,m,k;
 vector<int> v;
 // dp[l][i] = max attack when at line l and still have i attackers
 vector<vector<int>> dp;
-// stores (sum,index_of_the_sum) for very fast access ;) 
+// bound[l] == -1 if starting at position l is not possible to attack a line
+// otherwise it will contain the index r at which the attacking line ends
 vector<int> bound;
 
 void testcase(){
+  // initialization
   cin >> n >> m >> k;
   v.clear();
   v.resize(n+1,-1);
@@ -25,13 +27,11 @@ void testcase(){
   bound.clear();
   bound.resize(n+1,-1);
 
-  // initialization
   for(int i=1;i<=n;i++){
     cin >> v[i];
   }
-  
-  // bound[l] == -1 if starting at position l is not possible to attack a line
-  // otherwise it will contain the index r at which the attacking line ends
+
+  // sliding window for finding valid attack starting points
   int l=1,r=1;
   int s=v[1];
   while(r<=n){
@@ -48,12 +48,12 @@ void testcase(){
     }
   }
   
+  // starting from the end fill the dp
   l=n-1;
   dp[n+1][0] = 0;
   dp[n][0] = 0;
   if(v[n]==k) dp[n][1] = 1;
 
-  // starting from the end fill the dp
   while(l>=1){
     dp[l][0] = 0;
     // check if possible to start attacking a line at position l
