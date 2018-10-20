@@ -1,29 +1,23 @@
 #include <iostream>
 #include <bitset>
 #include <vector>
-#include <array>
+#include <map>
 
 using namespace std;
 
-#define trace(x) //cout << #x << " = " << x << endl
-#define btrace(x) //cout << #x << " = " << bitset<3>(x) << endl
+#define trace(x) cout << #x << " = " << x << endl
+#define btrace(x) cout << #x << " = " << bitset<3>(x) << endl
 
-void proom(vector<int> r){
-  //for(int x : r) cout << x << " ";
-  //cout << endl;
-
+void proom(const vector<int> & v){
+  for(int x : v) cout << x << " ";
+  cout << endl;
 }
 
 void testcase(){
   int N, M; cin >> N >> M;
   vector<int> b(M);
-  //vector<array<int,15>> L_on(N);
-  //vector<array<int,15>> L_off(N);
-  int L_on[N][M];
-  int L_off[N][M];
-  //vector<vector<pair<int,int>>> L(N,array<pair<int,vector<pair<int,int>>(M));
-  int room[1<<N][M];
-  for(int i=0;i<M;++i) room[0][i] = 0;
+  vector<vector<int>> L_on(N,vector<int>(M,0));
+  vector<vector<int>> L_off(N,vector<int>(M,0));
   //vector<array<int,15>> room(1<<N);
   for(int i=0;i<M;++i) cin >> b[i];
 
@@ -31,47 +25,77 @@ void testcase(){
     for(int j=0;j<M;++j){
       cin >> L_on[i][j];
       cin >> L_off[i][j];
-      //cin >> L[i][j].first;
-      //cin >> L[i][j].second;
-      room[0][j] += L_on[i][j];
     }
   }
-  //proom(room[0]);
 
-  for(int n_switches=1;n_switches<N;++n_switches){
-    for(int m_old=0;m_old < (1<<N); ++m_old){
-      if(__builtin_popcount(m_old) != n_switches-1) continue;
-      
-      for(int id_switch=0;id_switch<N;++id_switch){
-        if(m_old & (1<<id_switch)) continue;
-        trace(id_switch);
-        btrace(m_old);
-        //proom(room[m_old]);
-        //proom(room[m_old | (1<<id_switch)]);
-        bool all_right = true;
-        for(int i=0;i<M;++i){
-          room[m_old | (1<<id_switch)][i] = room[m_old][i];
-          room[m_old | (1<<id_switch)][i] -= L_on[id_switch][i];
-          room[m_old | (1<<id_switch)][i] += L_off[id_switch][i];
-          if(room[m_old | (1<<id_switch)][i] != b[i]) all_right = false;
-        }
-        //proom(room[m_old | (1<<id_switch)]);
-        if(all_right) {
-          cout << n_switches << endl;
-          return;
-        }
+  vector<vector<int>> L1(1<<(N/2),vector<int>(M,0));
+  vector<vector<int>> L2(1<<((N+1)/2),vector<int>(M,0));
+
+
+  for(int i=0;i<N/2;++i){
+    for(int j=0;j<M;++j){
+      L1[0][j] += L_on[i][j];
+    }
+  }
+  for(int i=N/2;i<N;++i){
+    for(int j=0;j<M;++j){
+      L2[0][j] += L_on[i][j];
+    }
+  }
+  //for(int x : L1[0]) cout << x << " ";
+  //cout << endl;
+
+  for(int i=0;i<(N/2); ++i){
+    for(int m_l1=0;m_l1 < 1<<i; ++m_l1){
+      for(int j=0;j<M;++j){
+        L1[m_l1 | (1<<i)][j] = L1[m_l1][j] + L_off[i][j] - L_on[i][j];
       }
     }
   }
 
-  /*
-  for(int i=0;i< (1<<N);++i){
-    btrace(i);
-    proom(room[i]);
+  for(int i=0;i< (N+1)/2; ++i){
+    for(int m_l2=0; m_l2 < 1<<i; ++m_l2){
+      for(int j=0;j<M;++j){
+        L2[(m_l2 | (1<<i))][j] = L2[m_l2][j] + L_off[i+N/2][j] - L_on[i+N/2][j];
+      }
+    }
+  }
 
+
+  /*
+  cout << "l1" << endl;
+  for(int i=0;i< 1<<(N/2); ++i){
+    btrace(i);
+    proom(L1[i]);
+  }
+  cout << "l2" << endl;
+  for(int i=0;i< 1<<(N+1)/2; ++i){
+    btrace(i);
+    proom(L2[i]);
   }
   */
-  cout << "impossible" << endl;
+
+  // <lights,n_switches>
+  map<vector<int>,int> ML2;
+  //ML2.reserve( 1<<(N+1)/2);
+  for(int i=0;i< 1 << (N+1)/2; ++i){
+    ML2.insert(make_pair(L2[i],__builtin_popcount(i)));
+  }
+
+  int best = 100;
+  for(int i=0; i < 1<<(N/2);++i){
+    vector<int> goal(b);
+    for(int j=0;j<M;++j) goal[j] -= L1[i][j];
+    auto it = ML2.find(goal);
+    if(it != ML2.end()){
+      best = min(best,__builtin_popcount(i) + (it->second));
+    }
+  }
+
+  if(best == 100)
+    cout << "impossible" << endl;
+  else
+    cout << best << endl;
 
 
 }
