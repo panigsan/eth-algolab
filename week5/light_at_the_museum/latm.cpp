@@ -18,7 +18,7 @@ void proom(const vector<int> & v){
 // - Compute all combinations for L1 and L2
 // - Store all mappings of L2 into a map <lights,n_bits>
 // - For each L1, check if there is a valid combination in L2 
-// The solution should run in O(2^n + 2^(n/2))
+// The solution should run in O(2^(n/2) + 2^(n/2))
 // - Building the DP and looking for valid matches
 void testcase(){
   int N, M; cin >> N >> M;
