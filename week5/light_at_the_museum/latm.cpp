@@ -6,19 +6,25 @@
 using namespace std;
 
 #define trace(x) cout << #x << " = " << x << endl
-#define btrace(x) cout << #x << " = " << bitset<3>(x) << endl
+#define btrace(x) cout << #x << " = " << bitset<18>(x) << endl
 
 void proom(const vector<int> & v){
   for(int x : v) cout << x << " ";
   cout << endl;
 }
 
+// Idea:
+// - Split the switches in two sets L1 and L2
+// - Compute all combinations for L1 and L2
+// - Store all mappings of L2 into a map <lights,n_bits>
+// - For each L1, check if there is a valid combination in L2 
+// The solution should run in O(2^n + 2^(n/2))
+// - Building the DP and looking for valid matches
 void testcase(){
   int N, M; cin >> N >> M;
   vector<int> b(M);
   vector<vector<int>> L_on(N,vector<int>(M,0));
   vector<vector<int>> L_off(N,vector<int>(M,0));
-  //vector<array<int,15>> room(1<<N);
   for(int i=0;i<M;++i) cin >> b[i];
 
   for(int i=0;i<N;++i){
@@ -42,9 +48,9 @@ void testcase(){
       L2[0][j] += L_on[i][j];
     }
   }
-  //for(int x : L1[0]) cout << x << " ";
-  //cout << endl;
 
+  // precompute all possible combinations for L1 and L2 using DP
+  // because we want it faaast
   for(int i=0;i<(N/2); ++i){
     for(int m_l1=0;m_l1 < 1<<i; ++m_l1){
       for(int j=0;j<M;++j){
@@ -61,25 +67,19 @@ void testcase(){
     }
   }
 
-
-  /*
-  cout << "l1" << endl;
-  for(int i=0;i< 1<<(N/2); ++i){
-    btrace(i);
-    proom(L1[i]);
-  }
-  cout << "l2" << endl;
-  for(int i=0;i< 1<<(N+1)/2; ++i){
-    btrace(i);
-    proom(L2[i]);
-  }
-  */
-
   // <lights,n_switches>
   map<vector<int>,int> ML2;
-  //ML2.reserve( 1<<(N+1)/2);
   for(int i=0;i< 1 << (N+1)/2; ++i){
-    ML2.insert(make_pair(L2[i],__builtin_popcount(i)));
+    auto it = ML2.find(L2[i]);
+    // either create a new map object or update it if smaller
+    if(it == ML2.end()) {
+      ML2.insert(make_pair(L2[i],__builtin_popcount(i)));
+    } else {
+      int bits = __builtin_popcount(i);
+      if(bits < it->second){
+        it->second = bits;
+      }
+    }
   }
 
   int best = 100;
@@ -96,8 +96,6 @@ void testcase(){
     cout << "impossible" << endl;
   else
     cout << best << endl;
-
-
 }
 
 int main(){
