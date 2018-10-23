@@ -9,24 +9,27 @@ using namespace std;
 int min_dist(int);
 int max_dist(int);
 
-int n;
-int m;
-int r;
-int b;
+int n, m, r, b;
 vector<vector<int>> g;
 vector<int> dp_min;
 vector<int> dp_max;
+
 void testcase(){
   cin >> n >> m >> r >> b;
 
   g.clear();
   dp_min.clear();
   dp_max.clear();
+  g.resize(n+1,vector<int>());
+  dp_min.resize(n+1,-1);
+  dp_max.resize(n+1,-1);
+  /*
   for(int i=0;i<=n;i++){
     g.push_back({});
-    dp_min.push_back(-1);
-    dp_max.push_back(-1);
+    //dp_min.push_back(-1);
+    //dp_max.push_back(-1);
   }
+  */
   for(int i=1;i<=m;i++){
     int u; cin >> u;
     int v; cin >> v;
