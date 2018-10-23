@@ -23,13 +23,7 @@ void testcase(){
   g.resize(n+1,vector<int>());
   dp_min.resize(n+1,-1);
   dp_max.resize(n+1,-1);
-  /*
-  for(int i=0;i<=n;i++){
-    g.push_back({});
-    //dp_min.push_back(-1);
-    //dp_max.push_back(-1);
-  }
-  */
+
   for(int i=1;i<=m;i++){
     int u; cin >> u;
     int v; cin >> v;
