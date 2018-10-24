@@ -21,7 +21,6 @@ typedef Graph::edge_iterator EdgeIt;
 typedef Graph::vertex_iterator VertexIt;
 typedef property_map<Graph,edge_weight_t>::type WeightMap;
 
-
 // Idea:
 // Create a graph with inverse edges since we care about only one target 
 // (which can be used as source). Run strong components to get all nodes
@@ -48,7 +47,6 @@ void testcase(){
     tie(e,success) = add_edge(v,u,G);
     weights[e] = c;
   }
-
 
   step("strong");
   std::vector<int> sccmap(2*n);
@@ -96,8 +94,6 @@ void testcase(){
     std::cout << best << std::endl;
   else
     std::cout << "no" << std::endl;
-
-
 }
   
 int main(){
