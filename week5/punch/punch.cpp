@@ -1,15 +1,15 @@
 #include <iostream>
 #include <vector>
-#include <cmath>
 
 using namespace std;
 
-#define mp make_pair
-#define trace(x) cout << #x << " = " << x << endl
-#define pr(x) "(" << x.first << "," << x.second << ")"
+// Debug only
+#define step(x)  cout << "Step " << x << endl
+#define trace(x) //cout << #x << " = " << x << endl
+#define pr(x)    "(" << x.first << "," << x.second << ")"
 
-int INF = 1<<20; 
-//int INF = numeric_limits<int>::max();
+// A very very large number
+int INF = 1<<22; 
 
 void testcase(){
   int n,k; cin >> n >> k;
@@ -21,24 +21,21 @@ void testcase(){
   }
 
   vector<vector<pair<int,int>>> dp(n+1,vector<pair<int,int>>(k+1,{0,0}));
-
   for(int i=0;i<=n;++i) dp[i][0] = make_pair(0,0);
   for(int i=1;i<=k;++i) dp[0][i] = make_pair(INF,-INF);
 
   for(int i=1;i<=n;++i){
     for(int j=1;j<=k;++j){
       dp[i][j] = dp[i-1][j];
-      for(int z=0;z<j;++z){
-        pair<int,int> x = dp[i-1][z];
-        int b = ceil((double)(j-z)/(double)l[i]);
-        int w = x.first + c[i]* b;
-        if(w < dp[i][j].first){
-          dp[i][j].first = w;
-          dp[i][j].second = x.second + 1;
-        } else if(w==dp[i][j].first){
-          if(x.second + 1 > dp[i][j].second){
-            dp[i][j].second = x.second+1;
-          }
+
+      // Try using the current line or the previous line z=[0,1]
+      for(int z=0; z<=1; ++z){
+        pair<int,int> x = dp[i-z][max(0,j-l[i])];
+        if(x.first + c[i] < dp[i][j].first){
+          dp[i][j].first = x.first+c[i];
+          dp[i][j].second = x.second + z;
+        } else if (x.first + c[i] == dp[i][j].first){
+          dp[i][j].second = max(dp[i][j].second, x.second+z);
         }
       }
     }
