@@ -1,42 +1,84 @@
 #include <iostream>
 #include <vector>
-#include <cassert>
+#include <algorithm>
 #include <bitset>
-#include <cmath>
+#include <map>
+#include <utility>
 
 using namespace std;
 
-#define trace(x)  cout << #x << " = " << x << endl
-#define btrace(x) cout << #x << " = " << bitset<12>(x) << endl
+// Used for debugging
+#define step(x)   //cout << "Step " << x << endl
+#define trace(x)  //cout << #x << " = " << x << endl
+#define btrace(x) //cout << #x << " = " << bitset<3>(x) << endl
 
-
-int n,k;
-vector<int> s;
 
 void testcase(){
+  int n,k;
   cin >> n >> k;
-  s.clear();
-  s.resize(n);
+
+  vector<long> s(n);
   for(int i=0;i<n;i++){
     cin >> s[i];
   }
 
-  int sol = 0;
-  vector<int> dp(1<<n);
-  for(int i=0;i<n;++i){
+  // Subset sub of L1 and L2 sets
+  vector<long> L1(1<<(n/2),0);
+  vector<long> L2(1<<((n+1)/2),0);
+
+  step("Computing subsets sum of L1 and L2");
+  for(int i=0;i<n/2;++i){
     for(int j=0;j < (1<<i); ++j){
-      dp[j | (1<<i)] = s[i] + dp[j];
+      L1[j | (1<<i)] = s[i]+L1[j];
     }
   }
 
-  for(int m_in=0;m_in< (1<<n); ++m_in){
-    if(__builtin_popcount(m_in) < n-k) continue;
+  for(int i=0;i<(n+1)/2;++i){
+    for(int j=0; j<(1<<i);++j){
+      L2[j | (1<<i)] = s[i+n/2] + L2[j];
+    }
+  }
 
+  step("Computing all Red and Blue team combinations in L2");
+  // < <Blu - Red, #bits> , #combinations>
+  map<pair<long,int>,long> ML2;
+  for(int m_in=0; m_in < 1<<((n+1)/2); ++m_in){
+    int tot_sum = L2[m_in];
     int m_red=0;
-    do{
-      if(dp[m_red] == dp[(~m_red) & m_in]) ++sol; 
-    } while ((m_red = (m_red - m_in) & m_in));
-  
+    int bits = __builtin_popcount(m_in);
+
+    do{ // Trick to go through all subsets of m_in
+      int m_blu = (~m_red) & m_in;
+      pair<long,int> key = make_pair(L2[m_blu]-L2[m_red],bits);
+      auto it = ML2.find(key);
+      if(it == ML2.end()){
+        ML2.insert(make_pair(key,1));
+      }else{
+        (it->second)++;
+      }
+    } while ( (m_red = (m_red - m_in) & m_in));
+  }
+
+  long sol=0;
+  // For each combination in L1, check how many valid combinations
+  // are in L2
+  step("Check L1 with L2");
+  for(int m_in=0; m_in < 1<<n/2; ++m_in){
+    int m_red=0;
+    int bits_in = __builtin_popcount(m_in);
+
+    do{ // Trick to go through all subsets of m_in
+      int m_blu = (~m_red) & m_in;
+      long goal = L1[m_red]-L1[m_blu];
+      for(int bits=0;bits<=(n+1)/2;++bits){
+        if(bits_in + bits < n-k) continue;
+
+        auto it = ML2.find(make_pair(goal,bits));
+        if(it != ML2.end()){
+          sol += it->second;
+        }
+      }
+    } while ( (m_red = (m_red - m_in) & m_in));
   }
 
   cout << sol << endl;
