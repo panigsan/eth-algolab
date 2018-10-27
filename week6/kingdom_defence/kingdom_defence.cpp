@@ -62,12 +62,9 @@ void testcase(){
   for(int i=0;i<l;++i){
     long g,d;
     std::cin >> g >> d;
-    if(g-d>0){
-      ea.addEdge(source,i,g-d);
-    }else{
-      ea.addEdge(i,target,d-g);
-      goal += d-g;
-    }
+    ea.addEdge(source,i,g);
+    ea.addEdge(i,target,d);
+    goal += d;
   }
 
   step("adding edges");
