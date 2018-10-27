@@ -80,8 +80,8 @@ void testcase(){
     bool success;
     tie(e,success) = edge(w+l+1,r,G);
     // add if not here yet OR it fits the whole width
-    if(success && l==0 && r==w) ecm[e]++;
-    else ea.addEdge(w+l+1,r,1);
+    if(!success) ea.addEdge(w+l+1,r,1);
+    else if(l==0 && r==w) ecm[e]++;
 
   }
   long flow = push_relabel_max_flow(G,0,2*w+1);
