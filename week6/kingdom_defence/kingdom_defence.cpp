@@ -57,7 +57,6 @@ void testcase(){
   ReverseEdgeMap rem = get(bs::edge_reverse,G);
   EdgeAdder ea(G,ecm,rem);
 
-  step("vertex");
   long goal=0;
   for(int i=0;i<l;++i){
     long g,d;
@@ -67,17 +66,24 @@ void testcase(){
     goal += d;
   }
 
-  step("adding edges");
   for(int i=0;i<p;++i){
     int u,v;
     std::cin >> u >> v;
     long c_min, c_max;
     std::cin >> c_min >> c_max;
-    ea.addEdge(u,v,c_max);
+    Vertex w = add_vertex(G);
+
+    // Limit the edge with c_max
+    ea.addEdge(u,w,c_max);
+    // Force to lose c_min
+    ea.addEdge(w,target,c_min);
+    goal += c_min;
+
+    ea.addEdge(w,v,c_max-c_min);
+    // Get the c_min again
+    ea.addEdge(source,v,c_min);
   }
 
-  step("computing");
-  //long flow = bs::edmonds_karp_max_flow(G,source,target);
   long flow = bs::push_relabel_max_flow(G,source,target);
   std::cout << (flow == goal ? "yes" : "no") << std::endl;
 }
