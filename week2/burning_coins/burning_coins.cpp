@@ -31,8 +31,6 @@ int solve(int l, int r, bool me){
   if(l>n || l>r) return -100000;
   if(l==r && me) return v[l];
   if(l==r && !me) return 0;
-  //if(l+1==r && me) return max(v[l],v[r]);
-  //if(l+1==r && !me) return min(v[l],v[r]);
   if(me && dp_m[l][r] != -1) return dp_m[l][r];
   if(!me && dp_o[l][r] != -1) return dp_o[l][r];
 
