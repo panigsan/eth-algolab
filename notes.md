@@ -24,3 +24,7 @@ away.
 
 Force some edge to have at least x flow by adding a vertex w in between 
 and creating a edge w->target with capacity x.
+
+## Week 7
+Linear programming. Check the constraints that I already have, they might 
+be useful for other constraitns (absolute values)
