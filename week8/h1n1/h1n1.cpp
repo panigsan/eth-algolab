@@ -12,16 +12,9 @@
 
 typedef long long ll;
 
-enum Color { White = 0, Visited = 1, Infinite = 2 };
-struct MyInfo {
-  Color color;
-  ll max_w;
-} ;
-
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Triangulation_vertex_base_2<K> Vb;
 typedef CGAL::Triangulation_face_base_with_info_2<ll,K> Fb;
-//typedef CGAL::Triangulation_face_base_with_info_2<std::pair<Color,K::Point_2>,K> Fb;
 typedef CGAL::Triangulation_data_structure_2<Vb,Fb> Tds;
 typedef CGAL::Delaunay_triangulation_2<K,Tds>  Triangulation;
 typedef Triangulation::Finite_faces_iterator  Face_iterator;
