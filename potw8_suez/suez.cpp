@@ -15,8 +15,6 @@ typedef CGAL::Quotient<ET> SolT;
 typedef CGAL::Quadratic_program<ET> Program;
 typedef CGAL::Quadratic_program_solution<ET> Solution;
 
-#define trace(x) std::cerr << #x << " = " << x << std::endl
-
 // round up to next integer double
 double ceil_to_double(const SolT& x)
 {
@@ -38,7 +36,7 @@ void testcase(){
     std::cin >> x >> y;
     pos_new[i] = std::make_pair(x,y);
   }
-  std::vector<std::pair<int,int>> pos_old(n);
+  std::vector<std::pair<long,long>> pos_old(m);
   for(int i=0;i<m;++i){
     long x,y;
     std::cin >> x >> y;
@@ -56,41 +54,43 @@ void testcase(){
       if(i==j) continue;
       long xj = pos_new[j].first;
       long yj = pos_new[j].second;
-      if(std::abs(xi-xj)*h < std::abs(yi-yj)*w){
+      long dx = std::abs(xi-xj);
+      long dy = std::abs(yi-yj);
+      if(dx*h < dy*w){
         lp.set_a(j,i*n+j,h);
         lp.set_a(i,i*n+j,h);
-        lp.set_b(  i*n+j,2*std::abs(yi-yj));
+        lp.set_b(  i*n+j,2*dy);
       } else {
         lp.set_a(j,i*n+j,w);
         lp.set_a(i,i*n+j,w);
-        lp.set_b(  i*n+j,2*std::abs(xj-xi));
+        lp.set_b(  i*n+j,2*dx);
       }
     }
+
+    // look for closest on x and y, considering the width and height
+    // of the picture
+    long min_x = 1<<30;
+    long min_y = 1<<30;
 
     for(int j=0;j<m;++j){
       long xj = pos_old[j].first;
       long yj = pos_old[j].second;
-      if(std::abs(xi-xj)*h < std::abs(yi-yj)*w){
-        lp.set_a(j,(n*n) + i*n+j,h);
-        lp.set_a(i,(n*n) + i*n+j,h);
-        lp.set_b(  (n*n) + i*n+j,2*std::abs(yi-yj));
-      } else {
-        lp.set_a(j,(n*n) + i*n+j,w);
-        lp.set_a(i,(n*n) + i*n+j,w);
-        lp.set_b(  (n*n) + i*n+j,2*std::abs(xj-xi));
-      }
+
+      long dx = std::abs(xi-xj);
+      long dy = std::abs(yi-yj);
+      if(dx*h < dy*w) min_y = std::min(min_y,dy);
+      else            min_x = std::min(min_x,dx);
     }
+
+    lp.set_a(i,(n*n) + i*2 + 0,h);
+    lp.set_b(  (n*n) + i*2 + 0,2*min_y-h);
+    lp.set_a(i,(n*n) + i*2 + 1,w);
+    lp.set_b(  (n*n) + i*2 + 1,2*min_x-w);
+
   }
 
   Solution s = CGAL::solve_linear_program(lp, ET());
-  Solution::Variable_value_iterator opt = s.variable_values_begin();
-  //trace(ceil_to_double(s.objective_value()));
-  //for(int i=0;i<n;++i) trace(ceil_to_double(*(opt+i)));
-  if(s.objective_value()>0)
-    std::cerr << s << std::endl;
   std::cout << ceil_to_double(-2*s.objective_value()) << std::endl;
-
-
 }
 
 int main() {
