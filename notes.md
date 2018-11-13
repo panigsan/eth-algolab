@@ -28,3 +28,12 @@ and creating a edge w->target with capacity x.
 ## Week 7
 Linear programming. Check the constraints that I already have, they might 
 be useful for other constraitns (absolute values)
+
+## Week 8
+Pay extremely attention with id of the edges and the face they belong to.
+!!!!! INT ARE VERY SMALL! SOLUTION MIGHT BE RIGHT BUT THERE MIGHT BE AN OVERFLOW !!!!!
+So if only very few cases are wrong, this might be the problem.
+In LP, when using `i*n + j` make sure that n is the right value to multiply and not m!
+When picking numeric_limits, make sure that you don't multiply this number otherwise there will 
+be another overflow! If you take 1<<30, make sure it is big enough!
+
