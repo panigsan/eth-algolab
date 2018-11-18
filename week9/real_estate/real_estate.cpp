@@ -19,9 +19,6 @@
 #include <boost/graph/successive_shortest_path_nonnegative_weights.hpp>
 #include <boost/graph/find_flow_cost.hpp>
 
-#define trace2(x,y) std::cerr << #x << "," << #y << " = " << x << "," << y << std::endl
-#define trace(x) std::cerr << #x << " = " << x << std::endl
-
 // BGL Graph definitions
 // ===================== 
 // Graph Type with nested interior edge properties for Cost Flow Algorithms
@@ -106,13 +103,6 @@ void testcase() {
 
     // Run the algorithm
 
-    // Option 1: Min Cost Max Flow with cycle_canceling
-    /*
-    int flow1 = boost::push_relabel_max_flow(G, src, trg);
-    boost::cycle_canceling(G);
-    int cost1 = boost::find_flow_cost(G);
-    std::cout << flow1 << " " << -cost1 << std::endl; // 5
-    */
     // Option 2: Min Cost Max Flow with successive_shortest_path_nonnegative_weights
     boost::successive_shortest_path_nonnegative_weights(G, src, trg);
     int cost2 = boost::find_flow_cost(G);
