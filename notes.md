@@ -37,3 +37,12 @@ In LP, when using `i*n + j` make sure that n is the right value to multiply and 
 When picking numeric_limits, make sure that you don't multiply this number otherwise there will 
 be another overflow! If you take 1<<30, make sure it is big enough!
 
+Segmentation faults are probably because you're accessing a vector at a wrong position!
+
+## Week 9
+Pay attention to indexes of objects. For instance in the real estate problem 
+the site id starts with 1, therefore it is important to do -1 when adding the edges.
+
+If a problem has negative values, you might add a constat to each of them to have 
+postive values. It doesn't work always though!
+
