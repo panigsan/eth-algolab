@@ -1,0 +1,74 @@
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Delaunay_triangulation_2.h>
+#include <CGAL/Triangulation_vertex_base_with_info_2.h>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
+#include <boost/graph/connected_components.hpp>
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <map>
+
+#define trace(x) std::cerr << #x << " = " << x << std::endl
+
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+typedef CGAL::Triangulation_vertex_base_with_info_2<int,K> Vb;
+typedef CGAL::Triangulation_face_base_2<K> Fb;
+typedef CGAL::Triangulation_data_structure_2<Vb,Fb> Tds;
+typedef CGAL::Delaunay_triangulation_2<K,Tds>  Triangulation;
+typedef Triangulation::Vertex_handle Vertex_handle;
+
+/*
+using namespace boost;
+typedef std::size_t ll;
+typedef adjacency_list < vecS, vecS, undirectedS,
+  no_property, no_property > Graph;
+typedef graph_traits < Graph >::edge_descriptor Edge;
+typedef graph_traits < Graph >::edge_iterator EdgeIt;
+typedef graph_traits < Graph >::vertex_descriptor Vertex;
+*/
+
+const ll INF = std::numeric_limits<ll>::max();
+
+void testcase()
+{
+  // read number of points
+  int n,m;
+  long p;
+  std::cin >> n >> m >> p;
+  // read points
+  std::vector<K::Point_2> pts;
+  pts.reserve(n);
+  for (int i = 0; i < n; ++i) {
+    K::Point_2 pnt;
+    std::cin >> pnt;
+    pts.push_back(pnt);
+  }
+  // construct triangulation
+  Triangulation t;
+  t.insert(pts.begin(), pts.end());
+
+  int i=0;
+  for(auto v = t.finite_vertices_begin();v!=t.finite_vertices_end();++v){
+    v->info() = i++;
+  }
+
+  // <dist, <u,v>>
+  std::vector<std::pair<long,std::pair<int,int>>> edges;
+
+  Triangulation::Finite_edges_iterator ebeg,eend;
+  for(Triangulation::Finite_edges_iterator it = t.finite_edges_begin();
+      it != t.finite_edges_end(); ++it){
+  
+  }
+  
+
+}
+
+int main(){
+  std::ios_base::sync_with_stdio(false);
+  int T;
+  std::cin >> T;
+  while(T--) testcase();
+  return 0;
+}
