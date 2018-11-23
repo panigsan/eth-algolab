@@ -27,9 +27,7 @@ void testcase()
   // read points
   std::vector<K::Point_2> pts(n);
   for (int i = 0; i < n; ++i) {
-    K::Point_2 pnt;
-    std::cin >> pnt;
-    pts.push_back(pnt);
+    std::cin >> pts[i];
   }
   // construct triangulation
   Triangulation t;
@@ -93,7 +91,6 @@ void testcase()
   // compute b
   uf.clear();
   for(int i=0;i<n;++i) G[i] = uf.make_set(i);
-
   std::vector<bool> in(m);
   for(auto e : edges){
     if(e.first > p) break;
@@ -111,7 +108,6 @@ void testcase()
 
   uf.clear();
   for(int i=0;i<n;++i) G[i] = uf.make_set(i);
-
   l=0;
   ll b=0;
   for(int i=0;i<m;++i){
