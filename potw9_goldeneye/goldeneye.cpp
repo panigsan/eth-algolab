@@ -28,14 +28,6 @@ typedef graph_traits<Graph>::vertices_size_type VertexIndex;
 typedef VertexIndex* Rank;
 typedef Vertex* Parent;
 
-/*
-typedef adjacency_list < vecS, vecS, undirectedS,
-  no_property, no_property > Graph;
-typedef graph_traits < Graph >::edge_descriptor Edge;
-typedef graph_traits < Graph >::edge_iterator EdgeIt;
-typedef graph_traits < Graph >::vertex_descriptor Vertex;
-*/
-
 const ll INF = std::numeric_limits<ll>::max();
 
 void testcase()
@@ -107,7 +99,7 @@ void testcase()
       a = std::max(a,edges[l].first);
       int u = edges[l].second.first;
       int v = edges[l].second.second;
-      add_edge(u,v,G);
+      //add_edge(u,v,G);
       ds.union_set(u,v);
       ++l;
     }
@@ -128,7 +120,7 @@ void testcase()
     if(e.first > p) break;
     int u = e.second.first;
     int v = e.second.second;
-    add_edge(u,v,G);
+    //add_edge(u,v,G);
     ds.union_set(u,v);
   }
 
@@ -157,7 +149,7 @@ void testcase()
       b = std::max(b,edges[l].first);
       int u = edges[l].second.first;
       int v = edges[l].second.second;
-      add_edge(u,v,G);
+      //add_edge(u,v,G);
       ds.union_set(u,v);
       ++l;
     }
