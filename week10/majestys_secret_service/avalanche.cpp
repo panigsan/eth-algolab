@@ -153,7 +153,7 @@ void testcase() {
 	  EdgeAdder eaG(G2, capacitymap, revedgemap);
     for(int i=0;i<dists.size();++i){
       if(get<0>(dists[i])>q) break;
-      eaG.addEdge(get<1>(dists[i]),get<2>(dists[i]),std::numeric_limits<int>::max());
+      eaG.addEdge(get<1>(dists[i]),get<2>(dists[i]),a);
     }
     for(auto ag : agents){
       eaG.addEdge(src,ag.first,ag.second);
@@ -176,48 +176,6 @@ void testcase() {
   q = l + (r-l)/2;
 
   std::cout << (q+d) << std::endl;
-  /*
-	// Create Graph and Maps
-	Graph G(4);
-	EdgeCapacityMap capacitymap = boost::get(boost::edge_capacity, G);
-	ReverseEdgeMap revedgemap = boost::get(boost::edge_reverse, G);
-	ResidualCapacityMap rescapacitymap = boost::get(boost::edge_residual_capacity, G);
-	EdgeAdder eaG(G, capacitymap, revedgemap);
-
-	// Add edges
-	eaG.addEdge(0, 1, 1); // from, to, capacity
-	eaG.addEdge(0, 3, 1);
-	eaG.addEdge(2, 1, 1);
-	eaG.addEdge(2, 3, 1);
-
-	// Add source and sink
-	// Careful: The names 'source' and 'target' are already used for BGL's 
-	// functions to get the two endpoints of an edge, use 'src' and 'sink'
-	// in case you remove the namespace (which we don't recommend).
-	Vertex source = boost::add_vertex(G);
-	Vertex target = boost::add_vertex(G);
-	eaG.addEdge(source, 0, 2);
-	eaG.addEdge(source, 2, 1);
-	eaG.addEdge(1, target, 2);
-	eaG.addEdge(3, target, 1);
-
-	// Calculate flow
-	// If not called otherwise, the flow algorithm uses the interior properties
-	// - edge_capacity, edge_reverse (read access),
-	// - edge_residual_capacity (read and write access).
-	long flow1 = boost::push_relabel_max_flow(G, source, target);
-	long flow2 = boost::edmonds_karp_max_flow(G, source, target);
-	std::cout << "(push relabel max flow) " << flow1 << " == " << flow2 << " (Edmonds Karp max flow)" << std::endl;
-
-	// Iterate over all the edges to print the flow along them
-	EdgeIt ebeg, eend;
-	for (tie(ebeg, eend) = edges(G); ebeg != eend; ++ebeg) {
-		std::cout << "edge from " << boost::source(*ebeg, G) << " to " << boost::target(*ebeg, G) 
-				  << " runs " << capacitymap[*ebeg] - rescapacitymap[*ebeg]
-                                  << " units of flow (negative for reverse direction)." << std::endl;
-	}
-	*/
-
 }
 
 // Main function to loop over the testcases
