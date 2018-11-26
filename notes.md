@@ -46,3 +46,6 @@ the site id starts with 1, therefore it is important to do -1 when adding the ed
 If a problem has negative values, you might add a constat to each of them to have 
 postive values. It doesn't work always though!
 
+## Week 10
+Check input size, maybe a brute force solution is feasible for 50 points!
+
