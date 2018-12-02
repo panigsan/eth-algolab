@@ -1,12 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <map>
 #include <string>
 #include <set>
 
 using namespace std;
-
-#define step(x) //cerr << "Step " << x << endl
 
 void testcase(){
   int n,q;
@@ -15,6 +14,7 @@ void testcase(){
   unordered_map<string,int> names;
   vector<string> inames(n);
   vector<int> parents(n,-1);
+  vector<int> p2(n,-1); // parent which points much higher in the tree
   vector<int> ages(n);
 
   for(int i=0;i<n;++i){
@@ -32,24 +32,24 @@ void testcase(){
     parents[names.find(c)->second] = names.find(p)->second;
   }
 
-  set<int> S;
   for(int i=0;i<q;++i){
     string s;
     int b;
     cin >> s >> b;
     int u = names.find(s)->second;
+    int v = u;
     
-    assert(S.find(u) == S.end());
+    while(parents[v] != -1 && ages[parents[v]] <= b){
+      if(p2[v] != -1 && ages[p2[v]] <= b) v = p2[v];
+      else v = parents[v];
+    }
 
-    while(parents[u] != -1 && ages[parents[u]] <= b) u = parents[u];
-
-    cout << inames[u] << " ";
+    if(p2[u] == -1) p2[u] = v;
+    else if(ages[v] > ages[p2[u]] ) p2[u] = v;
+    cout << inames[v] << " ";
   }
-
   cout << endl;
-
 }
-
 
 int main(){
   ios_base::sync_with_stdio(false);
