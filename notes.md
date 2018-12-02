@@ -48,4 +48,4 @@ postive values. It doesn't work always though!
 
 ## Week 10
 Check input size, maybe a brute force solution is feasible for 50 points!
-
+When using a custom base, make sure to use the right number of symbols!
