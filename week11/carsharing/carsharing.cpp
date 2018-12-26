@@ -78,17 +78,23 @@ struct book {
 void testcase() {
   int N,S;
   std::cin >> N >> S;
-  std::vector<int> L(S+1);
-  for(int i=1;i<=S;++i) std::cin >> L[i];
+  std::vector<int> L(S);
+  int tot_l = 0;
+  for(int i=0;i<S;++i){
+    std::cin >> L[i];
+    tot_l += L[i];
+  } 
 
   int max_time=0;
   std::vector<book> books(N);
-  std::set<int> ad;
+  std::unordered_set<int> ad;
+  int max_gain = 0;
   for(int i=0;i<N;++i){
     int s,t,d,a,p;
 		std::cin >> s >> t >> d >> a >> p;
     books[i] = {s,t,d,a,p};
     max_time = std::max(max_time,a);
+    max_gain = std::max(max_gain,p);
     ad.insert(a);
     ad.insert(d);
   }
@@ -100,7 +106,8 @@ void testcase() {
 
   int n_times = ad.size();
   // Create Graph and Maps
-  Graph G(n_times*2);
+  Graph G(n_times*S);
+  trace(n_times*S);
   EdgeCapacityMap capacitymap = boost::get(boost::edge_capacity, G);
   EdgeWeightMap weightmap = boost::get(boost::edge_weight, G);
   ReverseEdgeMap revedgemap = boost::get(boost::edge_reverse, G);
@@ -110,12 +117,15 @@ void testcase() {
   Vertex src = add_vertex(G);
   Vertex trg = add_vertex(G);
 
-  eaG.addEdge(src,0,L[1],0);
-  eaG.addEdge(src,n_times,L[2],0);
+  for(int i=0;i<S;++i){
+    eaG.addEdge(src,i*n_times,L[i],0);
+    eaG.addEdge(i*n_times+n_times-1,trg,INF,0);
+  }
 
   for(int i=0;i<n_times-1;++i){
-    eaG.addEdge(i,i+1,INF,100);
-    eaG.addEdge(n_times+i,n_times+i+1,INF,100);
+    for(int j=0;j<S;++j){
+      eaG.addEdge(j*n_times+i,j*n_times+i+1,INF,max_gain);
+    }
   }
 
   for(book b : books){
@@ -123,16 +133,14 @@ void testcase() {
     u = std::find(adv.begin(),adv.end(),b.d)-adv.begin();
     v = std::find(adv.begin(),adv.end(),b.a)-adv.begin();
     int dist = v-u;
-    if(b.s==2) u += n_times;
-    if(b.t==2) v += n_times;
-    eaG.addEdge(u,v,1,dist*100-b.p);
+    u += (b.s-1)*n_times;
+    v += (b.t-1)*n_times;
+    eaG.addEdge(u,v,1,dist*max_gain-b.p);
   }
   
-  eaG.addEdge(n_times-1,trg,INF,0);
-  eaG.addEdge(n_times+n_times-1,trg,INF,0);
   boost::successive_shortest_path_nonnegative_weights(G, src, trg);
   int cost2 = boost::find_flow_cost(G);
-  std::cout << ((L[1]+L[2])*100*(n_times-1)-cost2) << std::endl; // 12
+  std::cout << (tot_l*max_gain*(n_times-1)-cost2) << std::endl; // 12
 }
 
 int main(){
