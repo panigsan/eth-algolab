@@ -67,7 +67,7 @@ public:
 };
 
 #define trace(x) std::cerr << #x << " = " << x << std::endl
-const int INF = 300;
+const int INF = 30000;
 struct book {
   int s;
   int t;
@@ -87,27 +87,29 @@ void testcase() {
 
   int max_time=0;
   std::vector<book> books(N);
-  std::unordered_set<int> ad;
-  int max_gain = 0;
+  // each station has a set of times
+  std::vector<std::set<int>> pos(S);
   for(int i=0;i<N;++i){
     int s,t,d,a,p;
 		std::cin >> s >> t >> d >> a >> p;
     books[i] = {s,t,d,a,p};
+    pos[s-1].insert(d);
+    pos[t-1].insert(a);
     max_time = std::max(max_time,a);
-    max_gain = std::max(max_gain,p);
-    ad.insert(a);
-    ad.insert(d);
   }
 
+  // each stations has a mapping from time to vertex index
+  std::vector<std::unordered_map<int,int>> all_pos(S);
+  Graph G(0);
+  for(int i=0;i<S;++i){
+    pos[i].insert(0);
+    pos[i].insert(max_time);
+    for(auto it = pos[i].begin();it!=pos[i].end();++it){
+      all_pos[i][*it] = add_vertex(G);
+    }
+  }
   
-  std::vector<int> adv;
-  for(int x : ad) adv.push_back(x);
-  std::sort(adv.begin(),adv.end());
-
-  int n_times = ad.size();
   // Create Graph and Maps
-  Graph G(n_times*S);
-  trace(n_times*S);
   EdgeCapacityMap capacitymap = boost::get(boost::edge_capacity, G);
   EdgeWeightMap weightmap = boost::get(boost::edge_weight, G);
   ReverseEdgeMap revedgemap = boost::get(boost::edge_reverse, G);
@@ -118,29 +120,23 @@ void testcase() {
   Vertex trg = add_vertex(G);
 
   for(int i=0;i<S;++i){
-    eaG.addEdge(src,i*n_times,L[i],0);
-    eaG.addEdge(i*n_times+n_times-1,trg,INF,0);
-  }
-
-  for(int i=0;i<n_times-1;++i){
-    for(int j=0;j<S;++j){
-      eaG.addEdge(j*n_times+i,j*n_times+i+1,INF,max_gain);
+    for(auto it = pos[i].begin();std::next(it)!=pos[i].end();++it){
+      eaG.addEdge(all_pos[i][*it],all_pos[i][*std::next(it)],INF,(*std::next(it)-*it)*100);
     }
+    eaG.addEdge(src,all_pos[i][*pos[i].begin()],L[i],0);
+    eaG.addEdge(all_pos[i][*pos[i].rbegin()],trg,INF,0);
   }
 
   for(book b : books){
-    int u,v;
-    u = std::find(adv.begin(),adv.end(),b.d)-adv.begin();
-    v = std::find(adv.begin(),adv.end(),b.a)-adv.begin();
-    int dist = v-u;
-    u += (b.s-1)*n_times;
-    v += (b.t-1)*n_times;
-    eaG.addEdge(u,v,1,dist*max_gain-b.p);
+    int u = all_pos[b.s-1][b.d];
+    int v = all_pos[b.t-1][b.a];
+    eaG.addEdge(u,v,1,(b.a-b.d)*100-b.p);
   }
   
   boost::successive_shortest_path_nonnegative_weights(G, src, trg);
-  int cost2 = boost::find_flow_cost(G);
-  std::cout << (tot_l*max_gain*(n_times-1)-cost2) << std::endl; // 12
+  long cost = boost::find_flow_cost(G);
+  long offset = (long)max_time*100L*(long)tot_l;
+  std::cout << (offset-cost) << std::endl; 
 }
 
 int main(){
