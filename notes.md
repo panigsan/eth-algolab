@@ -49,3 +49,11 @@ postive values. It doesn't work always though!
 ## Week 10
 Check input size, maybe a brute force solution is feasible for 50 points!
 When using a custom base, make sure to use the right number of symbols!
+
+## Week 11
+In linear programming use Gmpq !!!!!!
+Also use both sol.is_infesible() || sol.objective_value() > x
+
+Binary search: when checking values L<=x<=R, starts with l=L-1 and r=R+1 and while (l<=r). Then solution is in
+l+(r-l)/2
+Also. keep again attention to int or long! Print the values, if they are negative, you used int instead of long
