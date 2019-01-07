@@ -38,20 +38,27 @@ void testcase(){
     G[u].push_back(make_pair(v,p));
   }
 
-  int l=1;
-  int r=k;
-  int c;
   dp.clear();
   dp.resize(n,vector<long>(k+1,-1));
+  int c;
+  for(c=1;c<=k;++c){
+    long t = solve(0,c);
+    if(t>=x) break;
+  }
+  /*
+  int l=1;
+  int r=k;
   do {
     c = l+(r-l)/2;
     long t = solve(0,c);
     if(t<x) l = c+1;
     else r=c-1;
   } while (l<=r);
-
   int t = l+(r-l)/2;
-  if(t<=k) cout << t << endl;
+  */
+
+  int best = c;
+  if(best<=k) cout << best << endl;
   else     cout << "Impossible" << endl;
 
 }
