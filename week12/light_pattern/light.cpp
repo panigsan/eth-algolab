@@ -6,9 +6,6 @@
 using namespace std;
 
 #define B 100000
-#define trace(x) cerr << #x << " = " << x << endl
-#define btrace(x) cerr << #x << " = " << bitset<2>(x) << endl
-#define one bitset<B>(1)
 
 int n,k,x;
 bitset<B> l;
@@ -52,7 +49,6 @@ void testcase(){
 
   long cnt = solve(n/k-1,false);
   cout << cnt << endl;
-
 }
 
 int main(){
