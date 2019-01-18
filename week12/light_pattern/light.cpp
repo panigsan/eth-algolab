@@ -19,13 +19,10 @@ long solve(int i, bool inv){
   // number of changes to the pattern
   long changes_to_norm = 0;
   for(int j=0;j<k;++j){
-    // keeping track if the patter is flipped or not
-    if(inv){
-      changes_to_norm += bx.test(j) == l.test(i*k+k-j-1);
-    } else {
-      changes_to_norm += bx.test(j) != l.test(i*k+k-j-1);
-    }
+    changes_to_norm += bx.test(j) == l.test(i*k+k-j-1);
   }
+  if(!inv) changes_to_norm = k-changes_to_norm;
+
   // either change the single bits of the current row OR
   // change them in the opposite way and flip the whole rows
   long best = min(changes_to_norm+solve(i-1,inv),(k-changes_to_norm) + 1 +solve(i-1,!inv));
@@ -34,7 +31,7 @@ long solve(int i, bool inv){
   return best;
 }
 
-void testcase(){
+void testcase() {
   cin >> n >> k >> x;
   bx = bitset<B>(x);
   l = 0;
