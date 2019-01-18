@@ -50,10 +50,9 @@ bool testcase(){
 
   for(int s : middle){
     if(s==I) return true;
-    auto it = left.find((I-s)%k);
+    auto it = left.find(abs((I-s)%k));
     if(it!=left.end()) return true;
   }
-  
   return false;
 }
 
