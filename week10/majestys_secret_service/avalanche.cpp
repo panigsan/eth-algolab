@@ -1,26 +1,10 @@
-// ALGOLAB BGL Tutorial 2
-// Flow example demonstrating
-// - interior graph properties for flow algorithms
-// - custom edge adder
-
-// Compile and run with one of the following:
-// g++ -std=c++11 -O2 flows.cpp -o flows ./flows
-// g++ -std=c++11 -O2 -I path/to/boost_1_58_0 flows.cpp -o flows; ./flows
-
-// Includes
-// ========
-// STL includes
 #include <iostream>
 #include <vector>
 #include <algorithm>
-// BGL includes
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/push_relabel_max_flow.hpp>
 #include <boost/graph/edmonds_karp_max_flow.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
-// Namespaces
-// using namespace std;
-// using namespace boost;
 
 #define trace(x) //std::cerr << #x << " = " << x << std::endl
 
@@ -71,19 +55,11 @@ public:
 
 
 // Functions
-// =========
-// Function for an individual testcase
 void testcase() {
   int n,m,a,s,c,d;
   std::cin >> n >> m >> a >> s >> c >> d;
-  trace(n);
-  trace(m);
-  trace(a);
-  trace(s);
-  trace(c);
-  trace(d);
-  // 739 1061 69 100 1 1
 
+  // Read the graph
   Graph G(n);
   WeightMap weights = get(boost::edge_weight,G);
   for(int i=0;i<m;++i){
@@ -99,6 +75,7 @@ void testcase() {
     }
   }
 
+  // Count number of agents in each position
   std::vector<int> n_agents(n,0);
   std::vector<int> n_shelts(n,0);
   for(int i=0;i<a;++i){
@@ -106,11 +83,13 @@ void testcase() {
     std::cin >> ag;
     ++n_agents[ag];
   }
+  // Count number of shelters at each position
   for(int i=0;i<s;++i){
     int sh;
     std::cin >> sh;
     ++n_shelts[sh];
   }
+  // [ <start point, number of agents> ]
   std::vector<std::pair<int,int>> agents;
   std::vector<std::pair<int,int>> shelts;
   for(int i=0;i<n;++i){
@@ -118,6 +97,8 @@ void testcase() {
     if(n_shelts[i] !=0) shelts.push_back(std::make_pair(i,n_shelts[i]));
   }
 
+  // Perform dijkstra from each agent to see the shortest time to reach each shelter
+  // [ <-dist, agent, shelter> ]
   std::vector<std::tuple<long,int,int>> dists;
   long y = 1<<30;
   for(auto ag : agents){
@@ -139,12 +120,13 @@ void testcase() {
 
   std::sort(dists.begin(),dists.end());
 
+  // Binary search to find minimal time required
   long l=0;
   long r=1<<30;
   long q;
   while(l<=r){
     q = l + (r-l)/2;
-    Graph G2(n);
+    Graph G2(n*3);
     Vertex src = add_vertex(G2);
     Vertex trg = add_vertex(G2);
 	  EdgeCapacityMap capacitymap = boost::get(boost::edge_capacity, G2);
@@ -152,25 +134,24 @@ void testcase() {
 	  ResidualCapacityMap rescapacitymap = boost::get(boost::edge_residual_capacity, G2);
 	  EdgeAdder eaG(G2, capacitymap, revedgemap);
     for(int i=0;i<dists.size();++i){
-      if(get<0>(dists[i])>q) break;
-      eaG.addEdge(get<1>(dists[i]),get<2>(dists[i]),a);
+      long arrival = get<0>(dists[i]);
+      if(arrival>q) break;
+      int agent_pos = get<1>(dists[i]);
+      int shelter_pos = get<2>(dists[i]);
+      eaG.addEdge(agent_pos,2*n+shelter_pos,a);
+      if(c==2 && arrival+d<=q)
+        eaG.addEdge(agent_pos,n+shelter_pos,a);
     }
     for(auto ag : agents){
       eaG.addEdge(src,ag.first,ag.second);
     }
     for(auto sh : shelts){
-      eaG.addEdge(sh.first,trg,sh.second);
+      eaG.addEdge(n+sh.first,trg,sh.second);
+      eaG.addEdge(2*n+sh.first,trg,sh.second);
     }
 	  long flow = boost::edmonds_karp_max_flow(G2, src, trg);
 
-    /*
-    trace(l);
-    trace(q);
-    trace(r);
-    trace(flow);
-    */
     if(flow<a) l = q+1;
-    //else if(flow==a) r = q;
     else r = q-1;
   }
   q = l + (r-l)/2;
@@ -178,7 +159,6 @@ void testcase() {
   std::cout << (q+d) << std::endl;
 }
 
-// Main function to loop over the testcases
 int main() {
 	std::ios_base::sync_with_stdio(false);
 	int T;
@@ -186,3 +166,4 @@ int main() {
   while(T--) testcase();
 	return 0;
 }
+
