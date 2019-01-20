@@ -105,12 +105,9 @@ void testcase() {
     std::vector<Vertex> predmap(n);	// We will use this vector as an Exterior Property Map: Vertex -> Dijkstra Predecessor
 	  std::vector<long> distmap(n,std::numeric_limits<int>::max());		// We will use this vector as an Exterior Property Map: Vertex -> Distance to source
 	  Vertex start = ag.first;
-	  boost::dijkstra_shortest_paths(G, start, // We MUST provide at least one of the two maps
-		  boost::predecessor_map(
-		    boost::make_iterator_property_map(predmap.begin(), 
-		      boost::get(boost::vertex_index, G))).	// predecessor map as Named Parameter
-		  distance_map(boost::make_iterator_property_map(distmap.begin(), 
-		      boost::get(boost::vertex_index, G))));	// distance map as Named Parameter
+    boost::dijkstra_shortest_paths(G,start,
+      boost::distance_map(boost::make_iterator_property_map(distmap.begin(),
+                                                  boost::get(boost::vertex_index,G))));
 		for(auto sh : shelts){
 		  if(distmap[sh.first] < std::numeric_limits<int>::max()){
 		    dists.push_back(std::make_tuple(distmap[sh.first],ag.first,sh.first));

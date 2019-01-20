@@ -57,3 +57,6 @@ Also use both sol.is_infesible() || sol.objective_value() > x
 Binary search: when checking values L<=x<=R, starts with l=L-1 and r=R+1 and while (l<=r). Then solution is in
 l+(r-l)/2
 Also. keep again attention to int or long! Print the values, if they are negative, you used int instead of long
+
+## Other
+World cups: used wrong computation of indexes! Used i*n+j instead of i*m+j.
