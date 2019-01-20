@@ -3,14 +3,12 @@
 #include <iomanip>
 #include <CGAL/QP_models.h>
 #include <CGAL/QP_functions.h>
-#include <CGAL/Gmpq.h>
+#include <CGAL/Gmpz.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/Delaunay_triangulation_2.h>
+#include <CGAL/intersections.h>
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 
 #define trace(x) std::cerr << #x << " = " << x << std::endl
-
-typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-typedef CGAL::Delaunay_triangulation_2<K>  Triangulation;
 
 // choose exact integral type
 typedef CGAL::Gmpq ET;
@@ -36,60 +34,60 @@ void testcase() {
   Program lp (CGAL::SMALLER, true, 0, false, 0);
 	std::vector<P> pos_w;
 	std::vector<P> pos_s;
-  // Read warehouses
+	/*
+	std::vector<int> s(n);
+	std::vector<int> a(n);
+	std::vector<int> u(m);
+	std::vector<int> d(m);
+	*/
 	for(int i=0;i<n;++i){
-		long x,y,s,a;
+		int x,y,s,a;
 		std::cin >> x >> y >> s >> a;	
-		
     pos_w.push_back(P(x,y));
 
 		lp.set_b(i,s);
 		for(int j=0;j<m;++j){
-			lp.set_a(i*m+j,i,1);     // limit supply
-			lp.set_a(i*m+j,n+j,a);   // limit alchool
-			lp.set_a(i*m+j,n+m+j,1); // equal liters
+			lp.set_a(i*n+j,i,1);
+			lp.set_a(i*n+j,n+j,a);
+			lp.set_a(i*n+j,n+m+j,1);
 		}
 	}
-  // Read stadions
 	for(int i=0;i<m;++i){
-		long x,y,d,u;
+		int x,y,d,u;
 		std::cin >> x >> y >> d >> u;
     pos_s.push_back(P(x,y));
 
-		lp.set_b(n+i,100.0*u);       // limit alchool
-		lp.set_b(n+m+i,d);           // equal lister 
+		lp.set_b(n+i,100*u);
+		lp.set_b(n+m+i,d);
 		lp.set_r(n+m+i,CGAL::EQUAL);
 	}
 
   std::vector<std::vector<double>> rew(n,std::vector<double>(m,0));
-  // Read reward
-  for(int i=0;i<n;++i){
-	  for(int j=0;j<m;++j){
+	for(int i=0;i<n;++i){
+		for(int j=0;j<m;++j){
 			double r;
 			std::cin >> r;
       rew[i][j] = r;
+			//lp.set_c(i*n+j,-r);
 		}
 	}
 
-  Triangulation t;
-  t.insert(pos_w.begin(),pos_w.end());
-  t.insert(pos_s.begin(),pos_s.end());
-
+  std::vector<std::vector<double>> T(n,std::vector<double>(m,0));
 	for(int i=0;i<c;++i){
 		long x,y,r;
 		std::cin >> x >> y >> r;
-    P center(x,y);
     K::Circle_2 contr(P(x,y),r);
 
-    auto vh = t.nearest_vertex(center);
-    if(CGAL::squared_distance(vh->point(),center)>=r*r) continue;
-
+    std::vector<bool> s_ins(m);
+    for(int k=0;k<m;++k){
+      s_ins[k] = CGAL::squared_distance(pos_s[k],contr.center())>contr.squared_radius();
+    }
     for(int j=0;j<n;++j){
-      bool w_in = CGAL::squared_distance(pos_w[j],center)<=r*r;
+      bool w_in = CGAL::squared_distance(pos_w[j],contr.center())>contr.squared_radius();
       for(int k=0;k<m;++k){
-        bool s_in = CGAL::squared_distance(pos_s[k],center)<=r*r;
-        if(w_in != s_in){
-          rew[j][k] -= 0.01;
+        bool s_in = s_ins[k];
+        if(w_in ^ s_in){
+          T[j][k] += 1.0;
         }
       }
     }
@@ -98,12 +96,13 @@ void testcase() {
 
 	for(int i=0;i<n;++i){
 		for(int j=0;j<m;++j){
-			lp.set_c(i*m+j,-rew[i][j]);
+			lp.set_c(i*n+j,-(rew[i][j]-T[i][j]/100.0));
 		}
 	}
 
+
   // solve the program, using ET as the exact type
-  Solution s = CGAL::solve_linear_program(lp, ET());
+  Solution s = CGAL::solve_nonnegative_linear_program(lp, ET());
 	if(s.is_infeasible()){
 		std::cout << "RIOT!" << std::endl;	
 	}
@@ -111,6 +110,7 @@ void testcase() {
 		std::cout << floor_to_double(-s.objective_value()) << std::endl;
 	}
 
+  // output solution
 }
 
 int main(){
@@ -120,4 +120,3 @@ int main(){
   std::cin >> T;
   while(T--) testcase();
 }
-
