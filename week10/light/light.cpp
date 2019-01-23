@@ -41,6 +41,11 @@ void testcase(){
       survivors=true;
       continue;
     }
+    // if there are survivors, no need to compute first hit
+    if(survivors){
+      hit_by[i]=0;
+      continue;
+    }
     // otherwise search for first light which hits the person
     for(int j=0;j<n;++j){
       if(CGAL::square(h+radi) >= CGAL::squared_distance(person,lights[j])){
