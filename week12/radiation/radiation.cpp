@@ -23,6 +23,7 @@ struct P {
   ET x,y,z;
 };
 
+// compute the powers in a recursive way only when necessary
 P pow(V<V<std::pair<bool,P>>>& pows,int idx, int power){
   if(power==0) return pows[idx][0].second;
   if(pows[idx][power].first) return pows[idx][power].second;
@@ -43,6 +44,8 @@ void testcase() {
   std::vector<P> T;
 
   std::pair<bool,P> init = std::make_pair(false,P({1,1,1}));
+  // for each healthy point store a list of <bool,P> where P is the point
+  // raised to a power and bool says if it has been computed yet or not
   V<V<std::pair<bool,P>>> powH(h,V<std::pair<bool,P>>(30,init));
   V<V<std::pair<bool,P>>> powT(t,V<std::pair<bool,P>>(30,init));
   for(int i=0;i<h;++i){
