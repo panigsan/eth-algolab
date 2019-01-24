@@ -103,7 +103,7 @@ void testcase() {
   }
 
   // solve the program, using ET as the exact type
-  Solution s = CGAL::solve_linear_program(lp, ET());
+  Solution s = CGAL::solve_nonnegative_linear_program(lp, ET());
   if(s.is_infeasible()){
     std::cout << "RIOT!" << std::endl;  
   }
