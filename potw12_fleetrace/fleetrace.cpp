@@ -98,24 +98,10 @@ void testcase() {
   assert(boost::edge(src,one,G).second);
   Edge e = boost::edge(src,one,G).first;
   boost::successive_shortest_path_nonnegative_weights(G, src, trg);
-  int flow1 = capacitymap[e]-rescapacitymap[e];
-  int cost1 = 50*flow1-boost::find_flow_cost(G);
+  int flow = capacitymap[e]-rescapacitymap[e];
+  int cost = 50*flow-boost::find_flow_cost(G);
 
-  int best_flow=0;
-  /*
-  for(int i=1;i<=std::min(b,s);++i){
-    capacitymap[e] = i;
-    int flow1 = capacitymap[e]-rescapacitymap[e];
-    int cost1 = 50*flow1-boost::find_flow_cost(G);
-    best_flow = std::max(best_flow,cost1);
-    if(flow1<i) break;
-  }
-  */
-  best_flow = cost1;
-
-
-  std::cout << best_flow << std::endl;
-
+  std::cout << cost << std::endl;
 }
 
 int main(){
