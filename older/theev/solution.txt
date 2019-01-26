@@ -1,0 +1,81 @@
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/Min_circle_2.h>
+#include <CGAL/Min_circle_2_traits_2.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+// typedefs
+typedef  CGAL::Exact_predicates_exact_constructions_kernel K;
+typedef  CGAL::Min_circle_2_traits_2<K>  Traits;
+typedef  CGAL::Min_circle_2<Traits>      Min_circle;
+typedef  K::Point_2 P;
+
+double ceil_to_double(const K::FT& x)
+{
+  double a = ceil(CGAL::to_double(x));
+  while (a <= x) a += 1;
+  while (a-1 > x) a -= 1;
+  return a;
+}
+
+void testcase() {
+	int n;
+	cin >> n;
+	vector<P> cities(n);
+	P city;
+	for (int i = 0; i < n; ++i) {
+		cin >> cities[i];
+		//cities[i] = city;
+	}
+
+	K::FT cost = 0;
+	if(n > 2) {
+		// Compute (squared) distance from first transmitter to each city
+		vector<pair<K::FT,P> > dist2(n-1);
+		//dist2[0] = make_pair(0, cities[0]);
+		for(int i = 1; i < n; ++i) {
+			K::FT d = CGAL::squared_distance(cities[0], cities[i]);
+			dist2[i - 1] = make_pair(d, cities[i]);
+		}
+
+		sort(dist2.begin(), dist2.end());
+
+		// Binary search the radius
+		int l = 0, r = dist2.size(), m = l + (r - l) / 2;
+		while(r - l > 1) {
+			//cout << l << " " << m << " " << r << endl;
+			K::FT curr_r = dist2[m].first;
+			// Find excluded cities
+			vector<P> excluded;
+			for(int i = 0; i < dist2.size(); ++i) {
+				if(dist2[i].first > curr_r)
+					excluded.push_back(dist2[i].second);
+			}
+			// Compute min encloding circle of excluded cities
+			Min_circle mc(excluded.begin(), excluded.end(), true);
+			Traits::Circle c = mc.circle();
+			// Determine next interval
+			if(c.squared_radius() <= curr_r) {
+				r = m;
+			}
+			else {
+				l = m;
+			}
+			m = l + (r - l) / 2;
+		}
+		cost = dist2[m].first;
+	}
+
+	// Output
+	cout << ceil_to_double(cost) << endl;
+}
+
+int main() {
+	int t;
+	cin >> t;
+	while(t--)
+		testcase();
+}
