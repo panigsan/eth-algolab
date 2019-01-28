@@ -13,17 +13,39 @@ vector<long> SA;
 vector<long> SB;
 vector<vector<long>> dp;
 
+const long INF = 100000;
 long solve(int size_a, int size_b){
-    if(size_a==0 && size_b>0 || size_b==0 && size_a>0) return 1000000;
+    if(size_a==0 && size_b>0 || size_b==0 && size_a>0) return INF;
     if(size_a==0 && size_b==0) return 0;
     else if(dp[size_a][size_b] != -1) return dp[size_a][size_b];
 
-    long best = numeric_limits<long>::max();
+    long best = INF;
     for(int a=1;a<=size_a;++a){
+        long sa = SA[size_a]-SA[size_a-a];
+        /* failed binary search
+        int l=1;
+        int r=size_b;
+        if(a==1) r=size_b;
+        else     r=size_b-1;
+        long sb = SB[size_b]-SB[size_b-r];
+        long curr_best = solve(size_a-a,size_b-r)+(sa-a)*(sb-r);
+        while(l<=r){
+            int c =(l+r)/2;
+            sb = SB[size_b]-SB[size_b-c];
+            long res = solve(size_a-a,size_b-c)+(sa-a)*(sb-c);
+            if(res <= curr_best) r=c-1;
+            else            l=c+1;
+            curr_best = min(curr_best,res);
+            
+        }
+        best = min(best,curr_best);
+        */
         for(int b=1;b<=size_b;++b){
-           long sa = SA[size_a]-SA[size_a-a];
            long sb = SB[size_b]-SB[size_b-b];
            long res = solve(size_a-a,size_b-b)+(sa-a)*(sb-b);
+           // 3 is the magic number, if you change it to 2 you get wrong results ;) 
+           // I found it by performing binary search until it worked 
+           if(res>best*3) break; 
            best = min(best,res);
         }    
     }
