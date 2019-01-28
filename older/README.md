@@ -1,2 +1,2 @@
 # Older exercises
-The solutions of these exercises were not written by me.
+Files named `solution.cpp` were not written by me.
