@@ -9,31 +9,6 @@ using namespace std;
 
 typedef vector<pair<unordered_set<int>,unordered_set<int>>> EQ;
 
-bool valid_greater(int i,const EQ& eq, const vector<char> &sign){
-    for(int j=0;j<eq.size();++j){
-        if(sign[j]=='='){
-            if(eq[j].first.count(i) || eq[j].second.count(i)) return false;
-        } else if(sign[j]=='>'){
-            if(eq[j].second.count(i)) return false;
-        } else if(sign[j]=='<'){
-            if(eq[j].first.count(i)) return false;
-        } 
-    }
-    return true;
-}
-bool valid_smaller(int i,const EQ& eq, const vector<char> &sign){
-    for(int j=0;j<eq.size();++j){
-        if(sign[j]=='='){
-            if(eq[j].first.count(i) || eq[j].second.count(i)) return false;
-        } else if(sign[j]=='>'){
-            if(eq[j].first.count(i)) return false;
-        } else if(sign[j]=='<'){
-            if(eq[j].second.count(i)) return false;
-        } 
-    }
-    return true;
-}
-
 void testcase(){
     int n,k;
     cin >> n >> k;
