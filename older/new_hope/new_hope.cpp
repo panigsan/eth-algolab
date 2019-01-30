@@ -11,51 +11,62 @@ using namespace std;
 #define btrace(x) cerr << #x << " = " << bitset<3>(x) << endl
 
 int k,s,m;
+// edges between stormtroppers
 vector<vector<int>> edges;
+// edges between command centers
 vector<vector<int>> edgesC;
+
+// return a unique index of the storm in the command center (0..k*s)
 int index(int command, int storm){
     return command*s + storm;    
 }
+// return the id of the command center where the storm belongs (0..k-1)
 int commander(int index){
     return index/s;    
 }
+// return the storm id inside of the command center (0..s-1)
 int restorm(int index){
     return index-s*commander(index);    
 }
 
-/*
-pair<int,int> solve(int idx){
-    if(edges[idx].size()==0) return {0,1};
-
-    pair<int,int> current = {0,1};
-    for(int next : edges[idx]){
-        pair<int,int> next_res = solve(next);
-        current.first += max(next_res.first,next_res.second);
-        current.second += next_res.first;
-    }
-    return current;
-}
-*/
-
+// dp[c][map] = maximum independent set from the c-th command center to the leaves
 vector<vector<int>> dp;
+// sub_dp[c][map] = maximum independent set of the c-th command center with map storm available
 vector<vector<int>> sub_dp;
 
 int solve(int com, int map){
+    // if it is the last command center
     if(edgesC[com].size()==0) return sub_dp[com][map];
     if(dp[com][map]!=-1) return dp[com][map];
     int best=0;
+    // for each next command center
     for(int next : edgesC[com]){
+        // new_map stores which stormtroopers are available in the next command center
+        // which depends on which stormtroopers are supervised by the current command
+        // center
         int new_map = (1<<s)-1;
         for(int i=0;i<s;++i){
+            // if stormtrooper i in current command center is available,
+            // then all his children in the next command center are not available
             if(map & (1<<i)){
+                // iterate over all his children
                 for(int next_st : edges[index(com,i)]){
+                    // if the children doesn't belong to the next command center, skip it
                     if(commander(next_st)!=next) continue;
+                    // otherwise remove it from the available map
                     int next_st_id = restorm(next_st);
                     new_map &= ~(1<<next_st_id); 
                 }
             }
         }
-        best += solve(next,new_map);
+        // iterate over all sub mask for the next command center
+        // to get the greatest value
+        int current = 0;
+        int sub_msk = 0;
+        do {
+            current = max(current,solve(next,sub_msk));
+        } while ((sub_msk=(sub_msk-new_map)&new_map));
+        best += current;
     }
 
     best += sub_dp[com][map];
@@ -66,15 +77,12 @@ int solve(int com, int map){
 
 void testcase(){
     cin >> k >> s >> m;
-    // edges between stormtroppers
     edges.clear();
     edges.resize(k*s,vector<int>());
-    // edges between command centers
     edgesC.clear();
     edgesC.resize(k,vector<int>());
     dp.clear();
     dp.resize(k,vector<int>(1<<s,-1));
-    // sub_dp[k][map] = maximum points in center k with the mapping
     sub_dp.clear();
     sub_dp.resize(k,vector<int>(1<<s,-1));
 
@@ -83,7 +91,8 @@ void testcase(){
     for(int i=0;i<m;++i){
         int u,v,h;
         cin >> u >> v >> h;
-        // if a stormtrooper watches someone in another
+        // if a stormtrooper watches someone in another command center,
+        // then the command center u has an edge to the command center v
         if(u!=v) edgesC[u].push_back(v);
         for(int j=0;j<h;++j){
             int x,y;
@@ -93,11 +102,11 @@ void testcase(){
         }
     }
 
-    // fill all possibilities for each command center
+    // compute all maximum independent set for each command center
     for(int c=0;c<k;++c){
-        trace(c);
         // try all mappings
         for(int i=0;i<(1<<s);++i){
+            // valid is true if no two stormtroopers are watching each other
             bool valid=true;
             // check that no two troops are supervising eachother
             for(int storm=0;storm<s;++storm){
@@ -124,12 +133,9 @@ void testcase(){
             } else {
                 count = __builtin_popcount(i);    
             }
-            btrace(i);
-            trace(count);
             sub_dp[c][i]=count;
         }    
     }
-
 
     int best=0;
     for(int i=0;i<(1<<s);++i){
