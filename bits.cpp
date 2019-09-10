@@ -18,6 +18,7 @@ int main(){
 
   cout << __builtin_popcount(x) << endl;
 
+  // trick to iterate over all submasks of the masks x
   int b=0;
   do {
     cout << bitset<8>(b) << endl;
